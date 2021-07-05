@@ -1,6 +1,6 @@
 import {useRoute} from '@react-navigation/core';
 import React, {useCallback, useEffect, useState} from 'react';
-import {StatusBar, StyleSheet, Text, View} from 'react-native';
+import {StatusBar, StyleSheet, View} from 'react-native';
 
 import {GiftedChat, IMessage} from 'react-native-gifted-chat';
 import {useInfiniteQuery, useMutation} from 'react-query';
@@ -14,17 +14,17 @@ export const Chat = () => {
   const [message, setMessage] = useState('');
   const [hasPreviousMessage, setHasPreviousMessage] = useState(false);
 
-  const {data, fetchNextPage: fetchPreviousMessage} = useInfiniteQuery(
-    queryKey,
-    chatService.getMessages,
-    {
-      getNextPageParam: lp => {
-        if (lp.length) {
-          return lp?.[lp.length - 1].createdAt;
-        }
-      },
+  const {
+    data,
+    fetchNextPage: fetchPreviousMessage,
+    isFetchingNextPage: fetchingMessage,
+  } = useInfiniteQuery(queryKey, chatService.getMessages, {
+    getNextPageParam: lp => {
+      if (lp.length) {
+        return lp?.[lp.length - 1].createdAt;
+      }
     },
-  );
+  });
 
   const sendMutation = useMutation(chatService.sendMessage, {
     onMutate: () => {
@@ -76,6 +76,7 @@ export const Chat = () => {
           setMessage(val);
         }}
         loadEarlier={hasPreviousMessage}
+        isLoadingEarlier={fetchingMessage}
         onLoadEarlier={fetchPreviousMessage}
         messages={giftedMessages}
         onSend={() => onSend()}

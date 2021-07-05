@@ -8,13 +8,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 export const Home = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState({roomId: 'room-1', username: 'dkc'});
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter roomId and UserName to Join</Text>
+      <Text style={styles.title}>Enter room and user name to join.</Text>
       <TextInput
         style={styles.input}
         onChangeText={val => setUser(user => ({...user, roomId: val}))}
@@ -27,14 +28,17 @@ export const Home = () => {
         value={user.username}
         placeholder="UserName"
       />
-      <Button
-        title="Join the Chat"
-        onPress={() =>
-          navigation.navigate('Chat', {
-            user,
-          })
-        }
-      />
+      <View style={styles.button}>
+        <Button
+          color="#a738d3"
+          title="Join the Chat"
+          onPress={() =>
+            navigation.navigate('Chat', {
+              user,
+            })
+          }
+        />
+      </View>
     </View>
   );
 };
@@ -44,20 +48,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 20,
   },
   title: {
     marginBottom: 20,
-    fontWeight: 'bold',
     fontSize: 18,
+    alignSelf: 'flex-start',
   },
   input: {
     borderWidth: 1,
     borderColor: '#aaa',
     marginBottom: 20,
-    minWidth: 250,
+    width: '100%',
     borderRadius: 5,
+    paddingLeft: 10,
+    fontSize: 16,
+    backgroundColor: '#eee',
   },
-  bottom: {
-    // paddingHorizontal: 15,
+  button: {
+    width: '100%',
   },
 });

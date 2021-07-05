@@ -6,6 +6,7 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 import {queryClient} from './src/config/queryClient';
 import {Chat} from './src/screens/Chat';
 import {Home} from './src/screens/Home';
+import {User} from './src/service/chat';
 
 const Stack = createStackNavigator();
 
@@ -21,7 +22,21 @@ const App = () => {
               component={Home}
               options={{headerShown: false}}
             />
-            <Stack.Screen name="Chat" component={Chat} />
+            <Stack.Screen
+              name="Chat"
+              component={Chat}
+              options={({route}) => {
+                const {user} = route.params as {user: User};
+                return {
+                  title: user.roomId || 'Chat Room',
+                  headerStyle: {
+                     height: 80,
+                     borderBottomLeftRadius:30,
+                     borderBottomRightRadius:30,
+                  },
+                };
+              }}
+            />
           </Stack.Navigator>
         </QueryClientProvider>
       </NavigationContainer>

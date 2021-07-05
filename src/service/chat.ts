@@ -19,7 +19,7 @@ export interface ChatMessage extends User {
   id?: string;
 }
 
-const PER_PAGE = 20;
+const PER_PAGE = 5;
 
 const sendMessage: MutationFunction<any, ChatMessage> = async message => {
   console.log('final', message);
