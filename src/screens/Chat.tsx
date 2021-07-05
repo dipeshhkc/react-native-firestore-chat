@@ -41,7 +41,6 @@ export const Chat = () => {
       user: {
         _id: message?.username,
         name: message?.username,
-        avatar: 'https://placeimg.com/140/140/people',
       },
     };
   }) as IMessage[];
