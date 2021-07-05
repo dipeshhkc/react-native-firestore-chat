@@ -12,8 +12,19 @@ export const Chat = () => {
   const {user} = route.params as {user: User};
   const queryKey = ['messages', user.roomId];
   const [message, setMessage] = useState('');
+  const [hasPreviousMessage, setHasPreviousMessage] = useState(false);
 
-  const {data} = useInfiniteQuery(queryKey, chatService.getMessages);
+  const {data, fetchNextPage: fetchPreviousMessage} = useInfiniteQuery(
+    queryKey,
+    chatService.getMessages,
+    {
+      getNextPageParam: lp => {
+        if (lp.length) {
+          return lp?.[lp.length - 1].createdAt;
+        }
+      },
+    },
+  );
 
   const sendMutation = useMutation(chatService.sendMessage, {
     onMutate: () => {
@@ -30,12 +41,24 @@ export const Chat = () => {
       user: {
         _id: message?.username,
         name: message?.username,
-        avatar: 'https://placeimg.com/140/140/any',
+        avatar: 'https://placeimg.com/140/140/people',
       },
     };
   }) as IMessage[];
 
   useEffect(() => chatService.attachMessageListener(queryKey), [user.roomId]);
+
+  const lastDate = messages?.[messages.length - 1]?.createdAt;
+
+  useEffect(() => {
+    const getNextPage = async () => {
+      const np = await chatService.hasMessageBefore(user.roomId, lastDate);
+      setHasPreviousMessage(np);
+    };
+    if (lastDate && user.roomId) {
+      getNextPage();
+    }
+  }, [lastDate, user.roomId]);
 
   const onSend = useCallback(() => {
     sendMutation.mutate({
@@ -47,12 +70,13 @@ export const Chat = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Chat Screen</Text>
       <GiftedChat
         text={message}
         onInputTextChanged={val => {
           setMessage(val);
         }}
+        loadEarlier={hasPreviousMessage}
+        onLoadEarlier={fetchPreviousMessage}
         messages={giftedMessages}
         onSend={() => onSend()}
         user={{

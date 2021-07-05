@@ -11,7 +11,7 @@ import {
 
 export const Home = () => {
   const navigation = useNavigation();
-  const [user, setUser] = useState({roomId: '', username: ''});
+  const [user, setUser] = useState({roomId: 'room-1', username: 'dkc'});
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Enter roomId and UserName to Join</Text>

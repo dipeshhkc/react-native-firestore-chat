@@ -35,10 +35,15 @@ const sendMessage: MutationFunction<any, ChatMessage> = async message => {
 
 const getMessages: QueryFunction<ChatMessage[]> = async key => {
   const roomId = key.queryKey[1];
+  let date = new Date();
+  if (key.pageParam) {
+    date = key.pageParam;
+  }
 
   const snapshot = await firestore()
     .collection(`Chats/${roomId}/messages`)
     .orderBy('createdAt', 'desc')
+    .where('createdAt', '<', date)
     .limit(PER_PAGE)
     .get();
   const retMessage: ChatMessage[] = [];
@@ -49,7 +54,20 @@ const getMessages: QueryFunction<ChatMessage[]> = async key => {
   return retMessage;
 };
 
-const attachMessageListener = (key: QueryKey): (() => void) => {
+const hasMessageBefore = async (roomId: string, date?: Date) => {
+  if (!date) {
+    return false;
+  }
+  const data = await firestore()
+    .collection(`Chats/${roomId}/messages`)
+    .orderBy('createdAt', 'desc')
+    .where('createdAt', '<', date)
+    .limit(1)
+    .get();
+  return !!data.docs.length;
+};
+
+const attachMessageListener = (key: string[]): (() => void) => {
   const roomId = key[1];
   return firestore()
     .collection(`Chats/${roomId}/messages`)
@@ -93,4 +111,6 @@ export const chatService = {
   sendMessage,
   getMessages,
   attachMessageListener,
+  hasMessageBefore,
+  PER_PAGE,
 };
